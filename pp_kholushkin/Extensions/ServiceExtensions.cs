@@ -33,7 +33,7 @@ namespace pp_kholushkin.Extensions
 			IConfiguration configuration) =>
 			services.AddDbContext<RepositoryContext>(opts =>
 			opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"), b =>
-				b.MigrationsAssembly("LR_1")));
+				b.MigrationsAssembly("pp_kholushkin")));
 		public static void ConfigureRepositoryManager(this IServiceCollection services)
 			=>
 				services.AddScoped<IRepositoryManager, RepositoryManager>();
