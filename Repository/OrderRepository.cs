@@ -1,6 +1,8 @@
 ﻿using Contracts;
 using Entities;
 using Entities.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Repository
 {
@@ -9,5 +11,9 @@ namespace Repository
 		public OrderRepository(RepositoryContext repositoryContext) : base(repositoryContext)
 		{
 		}
+
+		public IEnumerable<Order> GetAllOrders(bool trackChanges) => FindAll(trackChanges)
+			.OrderBy(c => c.Id)
+			.ToList();
 	}
 }
