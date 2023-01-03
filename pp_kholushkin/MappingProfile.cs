@@ -9,13 +9,17 @@ namespace pp_kholushkin
 		public MappingProfile()
 		{
 			CreateMap<Company, CompanyDto>().ForMember(c => c.FullAddress, opt => opt.MapFrom(x => string.Join(' ', x.Address, x.Country)));
-			CreateMap<Order, OrderDto>().ForMember(c => c.DateAndTime, opt => opt.MapFrom(x => string.Join(' ', x.Date, x.Time)));
 			CreateMap<Employee, EmployeeDto>();
-			CreateMap<Product, ProductDto>();
 			CreateMap<CompanyForCreationDto, Company>();
 			CreateMap<EmployeeForCreationDto, Employee>();
+			CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
+			CreateMap<CompanyForUpdateDto, Company>();
+			CreateMap<Order, OrderDto>().ForMember(c => c.DateAndTime, opt => opt.MapFrom(x => string.Join(' ', x.Date, x.Time)));
+			CreateMap<Product, ProductDto>();
 			CreateMap<OrderForCreationDto, Order>();
 			CreateMap<ProductForCreationDto, Product>();
+			CreateMap<ProductForUpdateDto, Product>().ReverseMap();
+			CreateMap<OrderForUpdateDto, Order>();
 		}
 	}
 }

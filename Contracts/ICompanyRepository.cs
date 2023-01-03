@@ -1,5 +1,5 @@
-﻿using Entities.Models;
-using System;
+﻿using System;
+using Entities.Models;
 using System.Collections.Generic;
 
 namespace Contracts
@@ -10,5 +10,6 @@ namespace Contracts
 		Company GetCompany(Guid companyId, bool trackChanges);
 		void CreateCompany(Company company);
 		IEnumerable<Company> GetByIds(IEnumerable<Guid> ids, bool trackChanges);
+		void DeleteCompany(Company company);
 	}
 }
