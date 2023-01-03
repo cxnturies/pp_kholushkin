@@ -8,13 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NLog;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace pp_kholushkin
 {
@@ -28,7 +23,6 @@ namespace pp_kholushkin
 
 		public IConfiguration Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.ConfigureCors();
@@ -37,10 +31,13 @@ namespace pp_kholushkin
 			services.ConfigureSqlContext(Configuration);
 			services.ConfigureRepositoryManager();
 			services.AddAutoMapper(typeof(Startup));
-			services.AddControllers();
+			services.AddControllers(config =>
+			{
+				config.RespectBrowserAcceptHeader = true;
+				config.ReturnHttpNotAcceptable = true;
+			}).AddXmlDataContractSerializerFormatters().AddCustomCSVFormatterCompany().AddCustomCSVFormatterOrder();
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerManager logger)
 		{
 			if (env.IsDevelopment())
