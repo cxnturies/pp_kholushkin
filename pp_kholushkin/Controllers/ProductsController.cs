@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace pp_kholushkin.Controllers
 			return Ok(productsDto);
 		}
 
-		[HttpGet("{id}")]
+		[HttpGet("{id}", Name = "GetProductForOrder")]
 		public IActionResult GetProductForOrders(Guid orderId, Guid Id)
 		{
 			var order = _repository.Order.GetOrder(Id, trackChanges: false);
@@ -55,6 +56,33 @@ namespace pp_kholushkin.Controllers
 
 			var product = _mapper.Map<ProductDto>(productDb);
 			return Ok(product);
+		}
+
+		[HttpPost]
+		public IActionResult CreateProductForOrder(Guid orderId, [FromBody] ProductForCreationDto product)
+		{
+			if (product == null)
+			{
+				_logger.LogError("ProductForCreationDto object sent from client is null.");
+				return BadRequest("ProductForCreationDto object is null");
+			}
+
+			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			if (order == null)
+			{
+				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
+				return NotFound();
+			}
+
+			var productEntity = _mapper.Map<Product>(product);
+			_repository.Product.CreateProductForOrder(orderId, productEntity);
+			_repository.Save();
+			var productToReturn = _mapper.Map<ProductDto>(productEntity);
+			return CreatedAtRoute("GetProductForOrder", new
+			{
+				orderId,
+				id = productToReturn.Id
+			}, productToReturn);
 		}
 	}
 }

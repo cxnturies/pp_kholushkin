@@ -12,6 +12,10 @@ namespace pp_kholushkin
 			CreateMap<Order, OrderDto>().ForMember(c => c.DateAndTime, opt => opt.MapFrom(x => string.Join(' ', x.Date, x.Time)));
 			CreateMap<Employee, EmployeeDto>();
 			CreateMap<Product, ProductDto>();
+			CreateMap<CompanyForCreationDto, Company>();
+			CreateMap<EmployeeForCreationDto, Employee>();
+			CreateMap<OrderForCreationDto, Order>();
+			CreateMap<ProductForCreationDto, Product>();
 		}
 	}
 }

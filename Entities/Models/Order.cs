@@ -21,8 +21,8 @@ namespace Entities.Models
 
 		[Column("Время заказа")]
 		[Required(ErrorMessage = "Время заказа является обязательным полем")]
-		[MaxLength(5, ErrorMessage = "Максимальная длина время заказа - 5 символов")]
-		public TimeSpan Time { get; set; }
+		[MaxLength(8, ErrorMessage = "Максимальная длина время заказа - 8 символов")]
+		public string Time { get; set; }
 
 		[Column("Район доставки")]
 		[Required(ErrorMessage = "Район доставки является обязательным полем")]

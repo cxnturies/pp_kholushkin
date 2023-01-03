@@ -8,5 +8,6 @@ namespace Contracts
 	{
 		IEnumerable<Product> GetProducts(Guid orderId, bool trackChanges);
 		Product GetProduct(Guid orderId, Guid Id, bool trackChanges);
+		void CreateProductForOrder(Guid orderId, Product product);
 	}
 }
