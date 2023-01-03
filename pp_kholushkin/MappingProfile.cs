@@ -10,6 +10,8 @@ namespace pp_kholushkin
 		{
 			CreateMap<Company, CompanyDto>().ForMember(c => c.FullAddress, opt => opt.MapFrom(x => string.Join(' ', x.Address, x.Country)));
 			CreateMap<Order, OrderDto>().ForMember(c => c.DateAndTime, opt => opt.MapFrom(x => string.Join(' ', x.Date, x.Time)));
+			CreateMap<Employee, EmployeeDto>();
+			CreateMap<Product, ProductDto>();
 		}
 	}
 }
