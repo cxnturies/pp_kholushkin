@@ -21,5 +21,10 @@ namespace Repository
 			product.OrderId = orderId;
 			Create(product);
 		}
+
+		public void DeleteProduct(Product product)
+		{
+			Delete(product);
+		}
 	}
 }

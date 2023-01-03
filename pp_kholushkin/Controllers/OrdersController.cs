@@ -103,5 +103,38 @@ namespace pp_kholushkin.Controllers
 			var ids = string.Join(",", orderCollectionToReturn.Select(c => c.Id));
 			return CreatedAtRoute("OrderCollection", new { ids }, orderCollectionToReturn);
 		}
+
+		[HttpDelete("{id}")]
+		public IActionResult DeleteOrder(Guid id)
+		{
+			var order = _repository.Order.GetOrder(id, trackChanges: false);
+			if (order == null)
+			{
+				_logger.LogInfo($"Order with id: {id} doesn't exist in the database.");
+				return NotFound();
+			}
+			_repository.Order.DeleteOrder(order);
+			_repository.Save();
+			return NoContent();
+		}
+
+		[HttpPut("{id}")]
+		public IActionResult UpdateOrder(Guid id, [FromBody] OrderForUpdateDto order)
+		{
+			if (order == null)
+			{
+				_logger.LogError("OrderForUpdateDto object sent from client is null.");
+				return BadRequest("OrderForUpdateDto object is null");
+			}
+			var orderEntity = _repository.Order.GetOrder(id, trackChanges: true);
+			if (orderEntity == null)
+			{
+				_logger.LogInfo($"Order with id: {id} doesn't exist in the database.");
+				return NotFound();
+			}
+			_mapper.Map(order, orderEntity);
+			_repository.Save();
+			return NoContent();
+		}
 	}
 }
