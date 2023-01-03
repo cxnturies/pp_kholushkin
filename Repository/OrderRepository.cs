@@ -18,5 +18,7 @@ namespace Repository
 			.ToList();
 
 		public Order GetOrder(Guid orderId, bool trackChanges) => FindByCondition(c => c.Id.Equals(orderId), trackChanges).SingleOrDefault();
+		public void CreateOrder(Order order) => Create(order);
+		public IEnumerable<Order> GetByIds(IEnumerable<Guid> ids, bool trackChanges) => FindByCondition(x => ids.Contains(x.Id), trackChanges).ToList();
 	}
 }
