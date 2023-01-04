@@ -1,8 +1,6 @@
 ﻿namespace Entities.DataTransferObjects
 {
-	public class ProductForCreationDto
+	public class ProductForCreationDto : ProductForManipulationDto
 	{
-		public string Name { get; set; }
-		public double Price { get; set; }
 	}
 }
