@@ -21,9 +21,12 @@ namespace Repository
 
         public async Task<Order> GetOrderAsync(Guid orderId, bool trackChanges) => await FindByCondition(c => c.Id.Equals(orderId), trackChanges)
             .SingleOrDefaultAsync();
+
         public void CreateOrder(Order order) => Create(order);
+
         public async Task<IEnumerable<Order>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges) => await FindByCondition(x => ids.Contains(x.Id), trackChanges)
             .ToListAsync();
+
         public void DeleteOrder(Order order)
         {
             Delete(order);
