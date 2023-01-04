@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace pp_kholushkin.Controllers
 {
@@ -25,33 +26,33 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetProductsForOrder(Guid orderId)
+		public async Task<IActionResult> GetProductsForOrder(Guid orderId)
 		{
-			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
 				return NotFound();
 			}
-			var productsFromDb = _repository.Product.GetProducts(orderId, trackChanges: false);
+			var productsFromDb = await _repository.Product.GetProductsAsync(orderId, trackChanges: false);
 			var productsDto = _mapper.Map<IEnumerable<ProductDto>>(productsFromDb);
 			return Ok(productsDto);
 		}
 
 		[HttpGet("{id}", Name = "GetProductForOrder")]
-		public IActionResult GetProductForOrders(Guid orderId, Guid Id)
+		public async Task<IActionResult> GetProductForOrder(Guid orderId, Guid id)
 		{
-			var order = _repository.Order.GetOrder(Id, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
-				_logger.LogInfo($"Order with id: {Id} doesn't exist in the database.");
+				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
 				return NotFound();
 			}
 
-			var productDb = _repository.Product.GetProduct(orderId, Id, trackChanges: false);
+			var productDb = await _repository.Product.GetProductAsync(orderId, id, trackChanges: false);
 			if (productDb == null)
 			{
-				_logger.LogInfo($"Product with id: {Id} doesn't exist in the database.");
+				_logger.LogInfo($"Product with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 
@@ -60,7 +61,7 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult CreateProductForOrder(Guid orderId, [FromBody] ProductForCreationDto product)
+		public async Task<IActionResult> CreateProductForOrder(Guid orderId, [FromBody] ProductForCreationDto product)
 		{
 			if (product == null)
 			{
@@ -68,7 +69,13 @@ namespace pp_kholushkin.Controllers
 				return BadRequest("ProductForCreationDto object is null");
 			}
 
-			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the ProductForCreationDto object");
+				return UnprocessableEntity(ModelState);
+			}
+
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
@@ -77,7 +84,7 @@ namespace pp_kholushkin.Controllers
 
 			var productEntity = _mapper.Map<Product>(product);
 			_repository.Product.CreateProductForOrder(orderId, productEntity);
-			_repository.Save();
+			await _repository.SaveAsync();
 			var productToReturn = _mapper.Map<ProductDto>(productEntity);
 			return CreatedAtRoute("GetProductForOrder", new
 			{
@@ -87,74 +94,85 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpDelete("{id}")]
-		public IActionResult DeleteProductForOrder(Guid orderId, Guid id)
+		public async Task<IActionResult> DeleteProductForOrder(Guid orderId, Guid id)
 		{
-			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
 				return NotFound();
 			}
-			var productForOrder = _repository.Product.GetProduct(orderId, id, trackChanges: false);
+			var productForOrder = await _repository.Product.GetProductAsync(orderId, id, trackChanges: false);
 			if (productForOrder == null)
 			{
 				_logger.LogInfo($"Product with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 			_repository.Product.DeleteProduct(productForOrder);
-			_repository.Save();
+			await _repository.SaveAsync();
 			return NoContent();
 		}
 
 		[HttpPut("{id}")]
-		public IActionResult UpdateProductForOrder(Guid orderId, Guid id, [FromBody] ProductForUpdateDto product)
+		public async Task<IActionResult> UpdateProductForOrder(Guid orderId, Guid id, [FromBody] ProductForUpdateDto product)
 		{
 			if (product == null)
 			{
 				_logger.LogError("ProductForUpdateDto object sent from client is null.");
 				return BadRequest("ProductForUpdateDto object is null");
 			}
-			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the ProductForUpdateDto object");
+				return UnprocessableEntity(ModelState);
+			}
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
 				return NotFound();
 			}
-			var productEntity = _repository.Product.GetProduct(orderId, id, trackChanges: true);
+			var productEntity = await _repository.Product.GetProductAsync(orderId, id, trackChanges: true);
 			if (productEntity == null)
 			{
 				_logger.LogInfo($"Employee with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 			_mapper.Map(product, productEntity);
-			_repository.Save();
+			await _repository.SaveAsync();
 			return NoContent();
 		}
 
 		[HttpPatch("{id}")]
-		public IActionResult PartiallyUpdateProductForOrder(Guid orderId, Guid id, [FromBody] JsonPatchDocument<ProductForUpdateDto> patchDoc)
+		public async Task<IActionResult> PartiallyUpdateProductForOrder(Guid orderId, Guid id, [FromBody] JsonPatchDocument<ProductForUpdateDto> patchDoc)
 		{
 			if (patchDoc == null)
 			{
 				_logger.LogError("patchDoc object sent from client is null.");
 				return BadRequest("patchDoc object is null");
 			}
-			var order = _repository.Order.GetOrder(orderId, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(orderId, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {orderId} doesn't exist in the database.");
 				return NotFound();
 			}
-			var productEntity = _repository.Product.GetProduct(orderId, id, trackChanges: true);
+			var productEntity = await _repository.Product.GetProductAsync(orderId, id, trackChanges: true);
 			if (productEntity == null)
 			{
 				_logger.LogInfo($"Product with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 			var productToPatch = _mapper.Map<ProductForUpdateDto>(productEntity);
-			patchDoc.ApplyTo(productToPatch);
+			patchDoc.ApplyTo(productToPatch, ModelState);
+			TryValidateModel(productToPatch);
+			if (!ModelState.IsValid)
+			{
+				_logger.LogError("Invalid model state for the patch document");
+				return UnprocessableEntity(ModelState);
+			}
 			_mapper.Map(productToPatch, productEntity);
-			_repository.Save();
+			await _repository.SaveAsync();
 			return NoContent();
 		}
 	}

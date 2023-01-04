@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace pp_kholushkin.Controllers
 {
@@ -26,17 +27,17 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetOrders()
+		public async Task<IActionResult> GetOrders()
 		{
-			var orders = _repository.Order.GetAllOrders(trackChanges: false);
+			var orders = await _repository.Order.GetAllOrdersAsync(trackChanges: false);
 			var ordersDto = _mapper.Map<IEnumerable<OrderDto>>(orders);
 			return Ok(ordersDto);
 		}
 
 		[HttpGet("{id}", Name = "OrderById")]
-		public IActionResult GetOrder(Guid id)
+		public async Task<IActionResult> GetOrder(Guid id)
 		{
-			var order = _repository.Order.GetOrder(id, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(id, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {id} doesn't exist in the database.");
@@ -50,7 +51,7 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult CreateOrder([FromBody] OrderForCreationDto order)
+		public async Task<IActionResult> CreateOrder([FromBody] OrderForCreationDto order)
 		{
 			if (order == null)
 			{
@@ -60,13 +61,13 @@ namespace pp_kholushkin.Controllers
 
 			var orderEntity = _mapper.Map<Order>(order);
 			_repository.Order.CreateOrder(orderEntity);
-			_repository.Save();
+			await _repository.SaveAsync();
 			var orderToReturn = _mapper.Map<OrderDto>(orderEntity);
 			return CreatedAtRoute("OrderById", new { id = orderToReturn.Id }, orderToReturn);
 		}
 
 		[HttpGet("collection/({ids})", Name = "OrderCollection")]
-		public IActionResult GetOrderCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+		public async Task<IActionResult> GetOrderCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
 		{
 			if (ids == null)
 			{
@@ -74,7 +75,7 @@ namespace pp_kholushkin.Controllers
 				return BadRequest("Parameter ids is null");
 			}
 
-			var orderEntities = _repository.Order.GetByIds(ids, trackChanges: false);
+			var orderEntities = await _repository.Order.GetByIdsAsync(ids, trackChanges: false);
 
 			if (ids.Count() != orderEntities.Count())
 			{
@@ -86,7 +87,7 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpPost("collection")]
-		public IActionResult CreateOrderCollection([FromBody] IEnumerable<OrderForCreationDto> orderCollection)
+		public async Task<IActionResult> CreateOrderCollection([FromBody] IEnumerable<OrderForCreationDto> orderCollection)
 		{
 			if (orderCollection == null)
 			{
@@ -98,42 +99,42 @@ namespace pp_kholushkin.Controllers
 			{
 				_repository.Order.CreateOrder(order);
 			}
-			_repository.Save();
+			await _repository.SaveAsync();
 			var orderCollectionToReturn = _mapper.Map<IEnumerable<OrderDto>>(orderEntities);
 			var ids = string.Join(",", orderCollectionToReturn.Select(c => c.Id));
 			return CreatedAtRoute("OrderCollection", new { ids }, orderCollectionToReturn);
 		}
 
 		[HttpDelete("{id}")]
-		public IActionResult DeleteOrder(Guid id)
+		public async Task<IActionResult> DeleteOrder(Guid id)
 		{
-			var order = _repository.Order.GetOrder(id, trackChanges: false);
+			var order = await _repository.Order.GetOrderAsync(id, trackChanges: false);
 			if (order == null)
 			{
 				_logger.LogInfo($"Order with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 			_repository.Order.DeleteOrder(order);
-			_repository.Save();
+			await _repository.SaveAsync();
 			return NoContent();
 		}
 
 		[HttpPut("{id}")]
-		public IActionResult UpdateOrder(Guid id, [FromBody] OrderForUpdateDto order)
+		public async Task<IActionResult> UpdateOrder(Guid id, [FromBody] OrderForUpdateDto order)
 		{
 			if (order == null)
 			{
 				_logger.LogError("OrderForUpdateDto object sent from client is null.");
 				return BadRequest("OrderForUpdateDto object is null");
 			}
-			var orderEntity = _repository.Order.GetOrder(id, trackChanges: true);
+			var orderEntity = await _repository.Order.GetOrderAsync(id, trackChanges: true);
 			if (orderEntity == null)
 			{
 				_logger.LogInfo($"Order with id: {id} doesn't exist in the database.");
 				return NotFound();
 			}
 			_mapper.Map(order, orderEntity);
-			_repository.Save();
+			await _repository.SaveAsync();
 			return NoContent();
 		}
 	}
