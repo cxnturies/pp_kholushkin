@@ -1,17 +1,18 @@
 using Contracts;
+using Entities.DataTransferObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using System.IO;
 using pp_kholushkin.ActionFilters;
-using Entities.DataTransferObjects;
-using Repository.DataShaping;
 using pp_kholushkin.Extensions;
+using Repository;
+using Repository.DataShaping;
+using System.IO;
 
 namespace pp_kholushkin
 {
@@ -43,8 +44,13 @@ namespace pp_kholushkin
 			services.AddScoped<ValidationFilterAttribute>();
 			services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			services.AddScoped<IDataShaper<ProductDto>, DataShaper<ProductDto>>();
+			services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 			services.AddAutoMapper(typeof(Startup));
 			services.ConfigureVersioning();
+			services.AddAuthentication();
+			services.ConfigureIdentity();
+			services.ConfigureIdentityCustomer();
+			services.ConfigureJWT(Configuration);
 			services.AddControllers(config =>
 			{
 				config.RespectBrowserAcceptHeader = true;
@@ -71,6 +77,7 @@ namespace pp_kholushkin
 				ForwardedHeaders = ForwardedHeaders.All
 			});
 			app.UseRouting();
+			app.UseAuthentication();
 			app.UseAuthorization();
 			app.UseEndpoints(endpoints =>
 			{
