@@ -146,17 +146,17 @@ namespace pp_kholushkin.Extensions
 				{
 					Title = "Customer API",
 					Version = "v1Customer",
-					Description = "OrderProducts API by LilChihba",
+					Description = "OrderProducts API by cxnturies",
 					TermsOfService = new Uri("https://example.com/terms"),
 					Contact = new OpenApiContact
 					{
-						Name = "LilChihba",
-						Email = "danila-yurov@mail.com",
+						Name = "cxnturies",
+						Email = "cxnturies@gmail.com",
 						Url = new Uri("https://twitter.com/johndoe"),
 					},
 					License = new OpenApiLicense
 					{
-						Name = "OrderProducts API by LilChihba",
+						Name = "OrderProducts API by cxnturies",
 						Url = new Uri("https://example.com/license"),
 					}
 				});
