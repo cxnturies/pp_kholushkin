@@ -11,8 +11,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using pp_kholushkin;
 using Repository;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Text;
 
 namespace pp_kholushkin.Extensions
@@ -107,6 +112,85 @@ namespace pp_kholushkin.Extensions
 					ValidAudience = jwtSettings.GetSection("validAudience").Value,
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
 				};
+			});
+		}
+
+		public static void ConfigureSwagger(this IServiceCollection services)
+		{
+			services.AddSwaggerGen(s =>
+			{
+				s.SwaggerDoc("v1", new OpenApiInfo
+				{
+					Title = "Code Maze API",
+					Version = "v1",
+					Description = "CompanyEmployees API by CodeMaze",
+					TermsOfService = new Uri("https://example.com/terms"),
+					Contact = new OpenApiContact
+					{
+						Name = "John Doe",
+						Email = "John.Doe@gmail.com",
+						Url = new Uri("https://twitter.com/johndoe"),
+					},
+					License = new OpenApiLicense
+					{
+						Name = "CompanyEmployees API LICX",
+						Url = new Uri("https://example.com/license"),
+					}
+				});
+				s.SwaggerDoc("v2", new OpenApiInfo
+				{
+					Title = "Code Maze API",
+					Version = "v2"
+				});
+				s.SwaggerDoc("v1Customer", new OpenApiInfo
+				{
+					Title = "Customer API",
+					Version = "v1Customer",
+					Description = "OrderProducts API by LilChihba",
+					TermsOfService = new Uri("https://example.com/terms"),
+					Contact = new OpenApiContact
+					{
+						Name = "LilChihba",
+						Email = "danila-yurov@mail.com",
+						Url = new Uri("https://twitter.com/johndoe"),
+					},
+					License = new OpenApiLicense
+					{
+						Name = "OrderProducts API by LilChihba",
+						Url = new Uri("https://example.com/license"),
+					}
+				});
+				s.SwaggerDoc("v2Customer", new OpenApiInfo
+				{
+					Title = "Customer API",
+					Version = "v2Customer"
+				});
+				s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					In = ParameterLocation.Header,
+					Description = "Place to add JWT with Bearer",
+					Name = "Authorization",
+					Type = SecuritySchemeType.ApiKey,
+					Scheme = "Bearer"
+				});
+				s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "Bearer"
+							},
+							Name = "Bearer",
+						},
+						new List<string>()
+					}
+				});
+				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+				s.IncludeXmlComments(xmlPath);
 			});
 		}
 	}

@@ -2,9 +2,9 @@
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using pp_kholushkin.ActionFilters;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using pp_kholushkin.ActionFilters;
 using System.Threading.Tasks;
 
 namespace pp_kholushkin.Controllers
@@ -26,7 +26,17 @@ namespace pp_kholushkin.Controllers
 			_authManager = authManager;
 		}
 
+		/// <summary>
+		/// Регистрация пользователя
+		/// </summary>
+		/// <returns>Зарегистрированный пользователь</returns>.
+		/// <response code="201"> Возвращает только что созданный элемент</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpPost]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
 		{
@@ -44,7 +54,17 @@ namespace pp_kholushkin.Controllers
 			return StatusCode(201);
 		}
 
+		/// <summary>
+		/// Авторизация пользователя
+		/// </summary>
+		/// <returns>Авторизованный пользователь</returns>.
+		/// <response code="200"> пользователь авторизовался</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpPost("login")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
 		{

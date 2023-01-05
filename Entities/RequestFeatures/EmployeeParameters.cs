@@ -1,9 +1,4 @@
-﻿using Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Entities.RequestFeatures
+﻿namespace Entities.RequestFeatures
 {
 	public class EmployeeParameters : RequestParameters
 	{

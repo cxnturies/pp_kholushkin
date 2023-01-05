@@ -44,6 +44,7 @@ namespace pp_kholushkin
 		}
 		private static void FormatCsv(StringBuilder buffer, CompanyDto company)
 		{
+
 			buffer.AppendLine($"{company.Id},\"{company.Name},\"{company.FullAddress}\"");
 		}
 	}
