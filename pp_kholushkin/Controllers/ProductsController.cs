@@ -3,14 +3,12 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.RequestFeatures;
-using pp_kholushkin.ActionFilters;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Repository.DataShaping;
+using pp_kholushkin.ActionFilters;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -34,6 +32,7 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpGet]
+		[HttpHead]
 		public async Task<IActionResult> GetProductsForOrder(Guid orderId, [FromQuery] ProductParameters productParameters)
 		{
 			if (!productParameters.ValidPriceRange)
