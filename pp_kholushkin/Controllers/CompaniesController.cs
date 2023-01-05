@@ -9,6 +9,7 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using pp_kholushkin.ModelBinders;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using pp_kholushkin.ActionFilters;
 
 namespace pp_kholushkin.Controllers
@@ -28,7 +29,7 @@ namespace pp_kholushkin.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "GetCompanies"), Authorize]
 		public async Task<IActionResult> GetCompanies()
 		{
 			var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges: false);

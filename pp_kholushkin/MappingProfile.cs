@@ -14,12 +14,15 @@ namespace pp_kholushkin
 			CreateMap<EmployeeForCreationDto, Employee>();
 			CreateMap<EmployeeForUpdateDto, Employee>().ReverseMap();
 			CreateMap<CompanyForUpdateDto, Company>();
+			CreateMap<UserForRegistrationDto, User>();
+
 			CreateMap<Order, OrderDto>().ForMember(c => c.DateAndTime, opt => opt.MapFrom(x => string.Join(' ', x.Date, x.Time)));
 			CreateMap<Product, ProductDto>();
 			CreateMap<OrderForCreationDto, Order>();
 			CreateMap<ProductForCreationDto, Product>();
 			CreateMap<ProductForUpdateDto, Product>().ReverseMap();
 			CreateMap<OrderForUpdateDto, Order>();
+			CreateMap<CustomerForRegistrationDto, Customer>();
 		}
 	}
 }

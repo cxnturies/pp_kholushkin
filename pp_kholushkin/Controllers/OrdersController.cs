@@ -3,6 +3,7 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using pp_kholushkin.ModelBinders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using pp_kholushkin.ActionFilters;
@@ -28,7 +29,7 @@ namespace pp_kholushkin.Controllers
 			_mapper = mapper;
 		}
 
-		[HttpGet]
+		[HttpGet(Name = "GetOrders"), Authorize]
 		public async Task<IActionResult> GetOrders()
 		{
 			var orders = await _repository.Order.GetAllOrdersAsync(trackChanges: false);
