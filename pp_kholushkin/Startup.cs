@@ -1,5 +1,7 @@
 using Contracts;
 using Entities.DataTransferObjects;
+using pp_kholushkin.ActionFilters;
+using pp_kholushkin.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -8,8 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using pp_kholushkin.ActionFilters;
-using pp_kholushkin.Extensions;
 using Repository;
 using Repository.DataShaping;
 using System.IO;
@@ -26,6 +26,7 @@ namespace pp_kholushkin
 
 		public IConfiguration Configuration { get; }
 
+		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.Configure<ApiBehaviorOptions>(options =>
@@ -50,6 +51,7 @@ namespace pp_kholushkin
 			services.AddAuthentication();
 			services.ConfigureIdentity();
 			services.ConfigureIdentityCustomer();
+			services.ConfigureSwagger();
 			services.ConfigureJWT(Configuration);
 			services.AddControllers(config =>
 			{
@@ -61,6 +63,7 @@ namespace pp_kholushkin
 			.AddCustomCSVFormatterOrder();
 		}
 
+		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerManager logger)
 		{
 			if (env.IsDevelopment())
@@ -79,6 +82,14 @@ namespace pp_kholushkin
 			app.UseRouting();
 			app.UseAuthentication();
 			app.UseAuthorization();
+			app.UseSwagger();
+			app.UseSwaggerUI(s =>
+			{
+				s.SwaggerEndpoint("/swagger/v1/swagger.json", "Code Maze API v1");
+				s.SwaggerEndpoint("/swagger/v2/swagger.json", "Code Maze API v2");
+				s.SwaggerEndpoint("/swagger/v1Customer/swagger.json", "Customer API v1");
+				s.SwaggerEndpoint("/swagger/v2Customer/swagger.json", "Customer API v2");
+			});
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();

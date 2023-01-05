@@ -9,13 +9,14 @@ using Entities.DataTransferObjects;
 using Entities.Models;
 using pp_kholushkin.ModelBinders;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using pp_kholushkin.ActionFilters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace pp_kholushkin.Controllers
 {
 	[Route("api/companies")]
 	[ApiController]
+	[ApiExplorerSettings(GroupName = "v1")]
 	public class CompaniesController : ControllerBase
 	{
 		private readonly IRepositoryManager _repository;
@@ -29,7 +30,22 @@ namespace pp_kholushkin.Controllers
 			_mapper = mapper;
 		}
 
+
+		/// <summary>
+		/// Получает список всех компаний
+		/// </summary>
+		/// <returns>Список компаний</returns>.
+		/// <response code="200"> Запрос выполнен успешно</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="401"> Не авторизован</response>.
+		/// <response code="403"> Доступ запрещён</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpGet(Name = "GetCompanies"), Authorize]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(401)]
+		[ProducesResponseType(403)]
+		[ProducesResponseType(422)]
 		public async Task<IActionResult> GetCompanies()
 		{
 			var companies = await _repository.Company.GetAllCompaniesAsync(trackChanges: false);
@@ -37,7 +53,18 @@ namespace pp_kholushkin.Controllers
 			return Ok(companiesDto);
 		}
 
+		/// <summary>
+		/// Получает данные о компании
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>Компания</returns>.
+		/// <response code="200"> Запрос выполнен успешно</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpGet("{id}", Name = "CompanyById")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		public async Task<IActionResult> GetCompany(Guid id)
 		{
 			var company = await _repository.Company.GetCompanyAsync(id, trackChanges: false);
@@ -53,7 +80,17 @@ namespace pp_kholushkin.Controllers
 			}
 		}
 
-		[HttpPost]
+		/// <summary>
+		/// Создает вновь созданную компанию
+		/// </summary>
+		/// <returns>Вновь созданная компания</returns>.
+		/// <response code="201"> Возвращает только что созданный элемент</response>.
+		/// <response code="400"> Элемент равен null</response>.
+		/// <response code="422"> Модель недействительна</response>.
+		[HttpPost(Name = "CreateCompany")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreationDto company)
 		{
@@ -64,7 +101,18 @@ namespace pp_kholushkin.Controllers
 			return CreatedAtRoute("CompanyById", new { id = companyToReturn.Id }, companyToReturn);
 		}
 
+		/// <summary>
+		/// Получает коллекцию компании
+		/// </summary>
+		/// <param name="ids"></param>.
+		/// <returns> Коллекция компании</returns>.
+		/// <response code="200"> Запрос выполнен успешно</response>.
+		/// <response code="400"> Элемент равен null</response>.
+		/// <response code="422"> Модель недействительна</response>.
 		[HttpGet("collection/({ids})", Name = "CompanyCollection")]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
 		{
 			if (ids == null)
@@ -82,7 +130,17 @@ namespace pp_kholushkin.Controllers
 			return Ok(companiesToReturn);
 		}
 
+		/// <summary>
+		/// Создает коллекцию для компании
+		/// </summary>
+		/// <returns> Коллекция компании</returns>.
+		/// <response code="201"> Возвращает только что созданный элемент</response>.
+		/// <response code="400"> Элемент равен null</response>.
+		/// <response code="422"> Модель недействительна</response>.
 		[HttpPost("collection")]
+		[ProducesResponseType(201)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		public async Task<IActionResult> CreateCompanyCollection([FromBody] IEnumerable<CompanyForCreationDto> companyCollection)
 		{
 			if (companyCollection == null)
@@ -101,7 +159,18 @@ namespace pp_kholushkin.Controllers
 			return CreatedAtRoute("CompanyCollection", new { ids }, companyCollectionToReturn);
 		}
 
+		/// <summary>
+		/// Удаляет определённую компанию
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>Компания</returns>.
+		/// <response code="204"> Элемент удалён</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpDelete("{id}")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		[ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
 		public async Task<IActionResult> DeleteCompany(Guid id)
 		{
@@ -111,7 +180,18 @@ namespace pp_kholushkin.Controllers
 			return NoContent();
 		}
 
+		/// <summary>
+		/// Обновляет данные компании
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>Компания</returns>.
+		/// <response code="204"> Элемент обновлён</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpPut("{id}")]
+		[ProducesResponseType(204)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		[ServiceFilter(typeof(ValidationFilterAttribute))]
 		[ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
 		public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyForUpdateDto company)
@@ -122,7 +202,17 @@ namespace pp_kholushkin.Controllers
 			return NoContent();
 		}
 
+		/// <summary>
+		/// Получение заголовков запроса
+		/// </summary>
+		/// <returns>Заголовки запроса</returns>.
+		/// <response code="200"> Запрос выполнен успешно</response>.
+		/// <response code="400"> Если элемент равен null</response>.
+		/// <response code="422"> Если модель недействительна</response>.
 		[HttpOptions]
+		[ProducesResponseType(200)]
+		[ProducesResponseType(400)]
+		[ProducesResponseType(422)]
 		public IActionResult GetCompaniesOptions()
 		{
 			Response.Headers.Add("Allow", "GET, OPTIONS, POST");

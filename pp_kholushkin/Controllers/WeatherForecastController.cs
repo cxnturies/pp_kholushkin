@@ -15,6 +15,11 @@ namespace pp_kholushkin.Controllers
 			_logger = logger;
 			_repository = repository;
 		}
+
+		/// <summary>
+		/// Логирование API
+		/// </summary>
+		/// <returns>Логи</returns>.
 		[HttpGet]
 		public ActionResult<IEnumerable<string>> Get()
 		{
