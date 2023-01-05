@@ -6,10 +6,10 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.RequestFeatures;
-using pp_kholushkin.ActionFilters;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using pp_kholushkin.ActionFilters;
 
 namespace pp_kholushkin.Controllers
 {
@@ -31,6 +31,7 @@ namespace pp_kholushkin.Controllers
 		}
 
 		[HttpGet]
+		[HttpHead]
 		public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
 		{
 			if (!employeeParameters.ValidAgeRange)

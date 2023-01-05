@@ -43,8 +43,8 @@ namespace pp_kholushkin
 			services.AddScoped<ValidationFilterAttribute>();
 			services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 			services.AddScoped<IDataShaper<ProductDto>, DataShaper<ProductDto>>();
-
 			services.AddAutoMapper(typeof(Startup));
+			services.ConfigureVersioning();
 			services.AddControllers(config =>
 			{
 				config.RespectBrowserAcceptHeader = true;
